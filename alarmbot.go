@@ -156,6 +156,8 @@ func main() {
 			chk(err)
 			if time.Now().Unix()-last_motion_alert > int64(viper.GetInt("squelch")) {
 				motionToSlack(slack_api, viper.GetString("my_name"), viper.GetString("to_channel"), fmt.Sprintf("https://ballarathackerspace.org.au/webcam%s.jpg", etime), count)
+			} else {
+				fmt.Println("squelched a motion alarm")
 			}
 			last_motion_alert = time.Now().Unix()
 		} else if channel == "ballarathackerspace.org.au/light" {
