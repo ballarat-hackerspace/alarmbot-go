@@ -40,11 +40,17 @@ func Split(s string) (string, string, string) {
 	return slice[0], slice2[0], slice2[1]
 }
 
-func logToSlack(api *slack.Client, my_name string, channel string, msg string) {
+func logToSlack(api *slack.Client, my_name string, channel string, msg string, fields []slack.AttachmentField) {
 	params := slack.NewPostMessageParameters()
 	params.Username = my_name
 	params.IconEmoji = ":page_with_curl:"
-	api.PostMessage(channel, msg, params)
+	attachment := slack.Attachment{}
+	attachment.Color = "#ffaa00"
+	attachment.Title = "Log Entry"
+	attachment.Text = msg
+        attachment.Fields = fields
+	params.Attachments = []slack.Attachment{attachment}
+        api.PostMessage(channel, "", params)
 }
 
 func statusToSlack(api *slack.Client, my_name string, channel string, msg string) {
@@ -115,7 +121,15 @@ func main() {
 	chk(err)
 
 	slack_api := slack.New(viper.GetString("slack_api"))
-	logToSlack(slack_api, viper.GetString("my_name"), viper.GetString("log_channel"), fmt.Sprintf("I'm online and monitoring:\ndebugging: %t\nmotion_squelch: %d\nalerts_to: %s\nlogging_to: %s", viper.GetBool("debugging"), viper.GetInt("squelch"), viper.GetString("to_channel"), viper.GetString("log_channel")))
+        fields := []slack.AttachmentField{
+          slack.AttachmentField{"debugging", viper.GetString("debugging"), true},
+          slack.AttachmentField{"squelch", viper.GetString("squelch"), true},
+          slack.AttachmentField{"log_channel", viper.GetString("log_channel"), true},
+          slack.AttachmentField{"to_channel", viper.GetString("to_channel"), true},
+          slack.AttachmentField{"port", viper.GetString("port"), true},
+          slack.AttachmentField{"lights_trip", viper.GetString("lights_trip"), true},
+        }
+	logToSlack(slack_api, viper.GetString("my_name"), viper.GetString("log_channel"), "I'm online and monitoring", fields)
 
 	ServerAddr, err := net.ResolveUDPAddr("udp", ":"+viper.GetString("port"))
 	chk(err)
