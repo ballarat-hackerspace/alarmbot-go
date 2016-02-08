@@ -109,6 +109,8 @@ func main() {
 	lights := Light{level: 0, lights_on: false}
 
 	viper.SetConfigName("config")
+	viper.AddConfigPath("/etc/alarmbot-go/")
+	viper.AddConfigPath("$HOME/.alarmbot-go/")
 	viper.AddConfigPath(".")
 	viper.SetDefault("port", 25276)
 	viper.SetDefault("debugging", false)
