@@ -48,9 +48,9 @@ func logToSlack(api *slack.Client, my_name string, channel string, msg string, f
 	attachment.Color = "#ffaa00"
 	attachment.Title = "Log Entry"
 	attachment.Text = msg
-        attachment.Fields = fields
+	attachment.Fields = fields
 	params.Attachments = []slack.Attachment{attachment}
-        api.PostMessage(channel, "", params)
+	api.PostMessage(channel, "", params)
 }
 
 func statusToSlack(api *slack.Client, my_name string, channel string, msg string) {
@@ -82,6 +82,7 @@ func lightsToSlack(api *slack.Client, my_name string, channel string, image stri
 }
 
 func motionToSlack(api *slack.Client, my_name string, channel string, image string, count int) {
+	_, _ = http.Get("https://ballarathackerspace.org.au/ws2812/a|10")
 	_, err := http.Get(image)
 	chk(err)
 
@@ -123,14 +124,14 @@ func main() {
 	chk(err)
 
 	slack_api := slack.New(viper.GetString("slack_api"))
-        fields := []slack.AttachmentField{
-          slack.AttachmentField{"debugging", viper.GetString("debugging"), true},
-          slack.AttachmentField{"squelch", viper.GetString("squelch"), true},
-          slack.AttachmentField{"log_channel", viper.GetString("log_channel"), true},
-          slack.AttachmentField{"to_channel", viper.GetString("to_channel"), true},
-          slack.AttachmentField{"port", viper.GetString("port"), true},
-          slack.AttachmentField{"lights_trip", viper.GetString("lights_trip"), true},
-        }
+	fields := []slack.AttachmentField{
+		slack.AttachmentField{"debugging", viper.GetString("debugging"), true},
+		slack.AttachmentField{"squelch", viper.GetString("squelch"), true},
+		slack.AttachmentField{"log_channel", viper.GetString("log_channel"), true},
+		slack.AttachmentField{"to_channel", viper.GetString("to_channel"), true},
+		slack.AttachmentField{"port", viper.GetString("port"), true},
+		slack.AttachmentField{"lights_trip", viper.GetString("lights_trip"), true},
+	}
 	logToSlack(slack_api, viper.GetString("my_name"), viper.GetString("log_channel"), "I'm online and monitoring", fields)
 
 	ServerAddr, err := net.ResolveUDPAddr("udp", ":"+viper.GetString("port"))
